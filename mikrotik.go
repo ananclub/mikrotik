@@ -1,6 +1,7 @@
 package mikrotik
 
 import (
+	"crypto/tls"
 	"errors"
 	"fmt"
 	"sync"
@@ -11,8 +12,14 @@ import (
 )
 
 // Dial to mikrotik router
-func Dial(addr, user, pass string) (*Mikrotik, error) {
-	c, err := routeros.Dial(addr, user, pass)
+func Dial(addr, user, pass string, config *tls.Config) (*Mikrotik, error) {
+	var c *routeros.Client
+	var err error
+	if config != nil {
+		c, err = routeros.DialTLS(addr, user, pass, config)
+	} else {
+		c, err = routeros.Dial(addr, user, pass)
+	}
 	if err != nil {
 		return nil, err
 	}
@@ -24,8 +31,14 @@ func Dial(addr, user, pass string) (*Mikrotik, error) {
 }
 
 // DialTimeout dial to mikrotik router with timeout
-func DialTimeout(addr, user, pass string, timeout time.Duration) (*Mikrotik, error) {
-	c, err := routeros.DialTimeout(addr, user, pass, timeout)
+func DialTimeout(addr, user, pass string, timeout time.Duration, config *tls.Config) (*Mikrotik, error) {
+	var c *routeros.Client
+	var err error
+	if config != nil {
+		c, err = routeros.DialTLSTimeout(addr, user, pass, config, timeout)
+	} else {
+		c, err = routeros.DialTimeout(addr, user, pass, timeout)
+	}
 	if err != nil {
 		return nil, err
 	}
